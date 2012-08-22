@@ -23,7 +23,7 @@ More or less, your demo has to be a 4k stripped Clojure jar, that can be run lik
 
 ### Rules
 
-Fork and go. The bash scrip (`build`)[https://github.com/hraberg/four/blob/master/build] will produce (and run) a jar that satisfies the limitations
+Fork and go. The bash scrip [`build`](https://github.com/hraberg/four/blob/master/build) will produce (and run) a jar that satisfies the limitations
 Dependencies and resources are allowed, but obviously need to fit the size limit. As can be seen above, PACK200 is allowed. Pulling resources from the network or local drive is not.
 
 
@@ -37,6 +37,6 @@ The animation itself is just a flickering of colors, but will obviously soon evo
 
 [Java4k Game Rules](http://www.java4k.com/index.php?action=view&page=rulesjudg)
 
-[scene.org Best 4k Intro (2011)]http://awards.scene.org/awards.php?year=2011&cat=10
+[scene.org Best 4k Intro (2011)](http://awards.scene.org/awards.php?year=2011&cat=10)
 
 [Assembly 4k Archive](http://archive.assembly.org/2011/4k-intro)
