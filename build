@@ -15,4 +15,9 @@ ls -la *.jar
 pack200  -G -Ustrip -r $PROJECT.jar
 ls -la *.jar
 
+if [ `ls -l $PROJECT.jar | awk '{print $5}'` -gt 4096 ]; then
+   echo "$PROJECT.jar is too big"
+   exit 1
+fi
+
 java -cp ~/.m2/repository/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.jar:$PROJECT.jar $PROJECT
