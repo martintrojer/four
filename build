@@ -2,7 +2,7 @@
 
 PROJECT=four
 JAR=$PROJECT.jar
-JAR_OUT=$PROJECT-pg.jar
+JAR_PG=$PROJECT-pg.jar
 CLOJURE_VERSION=1.5.0-alpha3
 CLOJURE_JAR=~/.m2/repository/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.jar
 
@@ -13,16 +13,19 @@ cd target
 rm -rf fullconf.pro
 echo "-injars $JAR" >> fullconf.pro
 echo "-libraryjars $CLOJURE_JAR" >>fullconf.pro
-echo "-outjars $JAR_OUT" >>fullconf.pro
+echo "-outjars $JAR_PG" >>fullconf.pro
 cat ../conf.pro >>fullconf.pro
 java -cp `lein classpath` proguard.ProGuard @fullconf.pro
 
-SIZE=`ls -l $JAR_OUT | awk '{print $5}'`
-echo "$JAR_OUT $SIZE"
+mv $JAR $PROJECT-leiningen.jar
+mv $JAR_PG $JAR
+
+SIZE=`ls -l $JAR | awk '{print $5}'`
+echo "$JAR $SIZE"
 
 if [ $SIZE -gt 4096 ]; then
-   echo "$JAR_OUT is too big"
+   echo "$JAR is too big"
    exit 1
 fi
 
-java -cp $CLOJURE_JAR:$JAR_OUT $PROJECT
+java -cp $CLOJURE_JAR:$JAR $PROJECT
