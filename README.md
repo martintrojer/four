@@ -1,7 +1,7 @@
 # 4k Clojure Demo Competition
 
 
-Me and [Martin](martinsprogrammingblog.blogspot.co.uk) were discussing the feasibility of this and quickly ended up in a debate about the rules, which he won.
+Me and [Martin](http://martinsprogrammingblog.blogspot.co.uk) were discussing the feasibility of this and quickly ended up in a debate about the rules, which he won.
 More or less, your demo has to be a 4k stripped Clojure jar, that can be run like this:
 
     java -cp clojure-1.4.0.jar:target/four.jar four
