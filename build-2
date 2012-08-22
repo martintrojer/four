@@ -1,0 +1,45 @@
+#!/bin/bash -e
+
+if [[ $1 == "" || $1 == "help" || $1 == "--help" ]]; then
+  echo "build classname"
+  echo "classname: name of the class with (defn -main) to use"
+  exit
+fi
+
+PROJECT=$1
+JAR=$PROJECT.jar
+JAR_PG=$PROJECT-pg.jar
+CLOJURE_VERSION=1.5.0-alpha3
+CLOJURE_JAR=~/.m2/repository/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.jar
+
+if [ ! -f src/$PROJECT.clj ] 
+then
+    echo "src/$PROJECT.clj doesn't exist!"
+    exit
+fi
+
+rm -rf target
+rm -rf project.clj
+echo "(defproject $PROJECT \"0.1.0\" :dependencies [[org.clojure/clojure \"$CLOJURE_VERSION\"]] :profiles {:dev {:dependencies [[net.sf.proguard/proguard-base \"4.8\"]]}} :plugins [[lein-swank \"1.4.4\"]] :jar-name \"$JAR\" :jar-exclusions [#\"project.clj\" #\"maven\" #\"leiningen\"] :main $PROJECT)" >> project.clj
+lein jar
+
+cd target
+echo "-injars $JAR" >> conf.pro
+echo "-outjars $JAR_PG" >> conf.pro
+echo "-libraryjars <java.home>/lib/rt.jar" >> conf.pro
+echo "-libraryjars $CLOJURE_JAR" >> conf.pro
+echo "-keep public class $PROJECT {public static void main(java.lang.String[]);}" >> conf.pro
+java -cp `lein classpath` proguard.ProGuard @conf.pro
+
+mv $JAR $PROJECT-leiningen.jar
+mv $JAR_PG $JAR
+
+SIZE=`ls -l $JAR | awk '{print $5}'`
+echo "$JAR $SIZE"
+
+if [ $SIZE -gt 4096 ]; then
+   echo "$JAR is too big"
+   exit 1
+fi
+
+java -cp $CLOJURE_JAR:$JAR $PROJECT

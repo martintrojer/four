@@ -1,0 +1,61 @@
+#!/bin/bash -e
+
+if [[ $1 == "" || $1 == "help" || $1 == "--help" ]]; then
+  echo "build classname [proguard/pack200]"
+  echo "classname: name of the class with (defn -main) to use"
+  echo "proguard (optional): use proguard to shrink the output [default]"
+  echo "pack200 (optional): use pack200 to shrink the output"
+  exit
+fi
+
+USE_PACK200="no"
+USE_PROGUARD="yes"
+
+if [[ $2 == "proguard" ]]; then
+  USE_PROGUARD="yes"
+fi
+if [[ $2 == "pack200" ]]; then
+  USE_PACK200="yes"
+fi
+
+PROJECT=$1
+JAR=$PROJECT.jar
+JAR_OUT=$PROJECT-out.jar
+CLOJURE_VERSION=1.4.0
+#CLOJURE_VERSION=1.5.0-alpha3
+CLOJURE_JAR=~/.m2/repository/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.jar
+
+rm -rf target
+lein jar
+
+cd target
+zip -q $JAR -d "META-INF/maven*" "META-INF/leiningen*" "*.class"
+cd classes
+zip -q ../$JAR $PROJECT.class
+cd ..
+
+cp $JAR $JAR_OUT
+
+if [[ $USE_PACK200 == "yes" ]]; then
+    pack200  -G -Ustrip -r $JAR_OUT
+fi
+
+if [[ $USE_PROGUARD == "yes" ]]; then
+    rm -rf $JAR_OUT
+    echo "-injars $JAR" >> conf.pro
+    echo "-outjars $JAR_OUT" >> conf.pro
+    echo "-libraryjars <java.home>/lib/rt.jar" >> conf.pro
+    echo "-libraryjars $CLOJURE_JAR" >> conf.pro
+    echo "-keep public class $PROJECT {public static void main(java.lang.String[]);}" >> conf.pro
+    java -jar ../proguard.jar @conf.pro
+fi
+
+SIZE=`ls -l $JAR_OUT | awk '{print $5}'`
+echo "$JAR_OUT $SIZE"
+
+if [ $SIZE -gt 4096 ]; then
+   echo "$JAR_OUT is too big"
+   exit 1
+fi
+
+java -cp $CLOJURE_JAR:$JAR_OUT $PROJECT
