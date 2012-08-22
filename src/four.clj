@@ -7,40 +7,49 @@
 (def h 600)
 (def hz 50)
 
-(defn frame [g w h]
-  (doto g
-    (.setColor (Color. (rand-int 0xffffff)))
-    (.fillRect 0 0 w h)
-    (.setColor Color/WHITE)
-    (.drawString "4k.clj" 20 30)))
+(defn frame [g w h s]
+  (let [c (Color. (rand-int 0xffffff))]
+    (doto g
+      (.setColor c)
+      (.fillRect 0 0 w h)
+      (.setColor Color/WHITE)
+      (.drawString "4k.clj" 20 30))
+    (assoc s :color c)))
 
-(defn draw [f c]
-  (let [b (.getBufferStrategy c)
-        g (.getDrawGraphics b)
-        [w h] [(.getWidth c) (.getHeight c)]]
-    (try
-      (f g w h)
-      (finally
-       (.dispose g)))
-    (when-not (.contentsLost b)
-      (.show b))))
+(defn timeline [] (repeat frame))
 
-(defn run [f c]
+(defn draw
+  ([c f s]
+     (let [b (.getBufferStrategy c)
+           g (.getDrawGraphics b)
+           [w h] [(.getWidth c) (.getHeight c)]]
+       (try
+         (f g w h (update-in s [:frame] inc))
+         (finally
+          (.dispose g)
+          (when-not (.contentsLost b)
+            (.show b)))))))
+
+(defn run [s f]
   (let [t (System/nanoTime)]
     (try
-      (let [_ (f c)
+      (let [s (f s)
             d (- (System/nanoTime) t)
             l (/ 1000000000 hz)]
         (when (<  d l)
           (Thread/sleep (/ (- l d) 1000000)))
-        {:duration d})
+        (assoc s :duration d))
       (catch Exception e
         (println e)))))
 
-(defn start []
+(defn animate [d fs]
+  (map #(partial d %) fs))
+
+(defn canvas []
   (let [f (doto (JFrame.)
             (.setResizable false)
             (.setVisible true)
+            .requestFocus
             (.setDefaultCloseOperation JFrame/DISPOSE_ON_CLOSE))
         c (Canvas.)]
     (doto (.getContentPane f)
@@ -49,8 +58,10 @@
     (.pack f)
     (doto c
       (.setIgnoreRepaint true)
-      (.createBufferStrategy 2))
-    (repeatedly #(run (partial draw frame) c))))
+      (.createBufferStrategy 2))))
+
+(defn start []
+  (reductions run {:frame 0} (animate (partial draw (canvas)) (timeline))))
 
 (defn -main [& args]
   (dorun (start)))
