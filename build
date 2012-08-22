@@ -10,11 +10,6 @@ rm -rf target
 lein jar
 
 cd target
-zip -q $JAR -d "META-INF/maven*" "META-INF/leiningen*" "*.class"
-cd classes
-zip -q ../$JAR $PROJECT.class
-cd ..
-
 rm -rf fullconf.pro
 echo "-injars $JAR" >> fullconf.pro
 echo "-libraryjars $CLOJURE_JAR" >>fullconf.pro

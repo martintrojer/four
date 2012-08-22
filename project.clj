@@ -3,5 +3,5 @@
   :profiles {:dev {:dependencies [[net.sf.proguard/proguard-base "4.8"]]}}
   :plugins [[lein-swank "1.4.4"]]
   :jar-name "four.jar"
-  :jar-exclusions [#"project.clj"]
+  :jar-exclusions [#"project.clj" #"maven" #"leiningen"]
   :main four)
