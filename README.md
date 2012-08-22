@@ -23,7 +23,7 @@ More or less, your demo has to be a 4k stripped Clojure jar, that can be run lik
 ### Rules
 
 Fork and go. The bash script [`build`](https://github.com/hraberg/four/blob/master/build) will produce (and run) a jar that satisfies the limitations.
-Dependencies and resources are allowed, but obviously need to fit the size limit. As can be seen above, PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not.
+Dependencies and resources are allowed, but obviously need to fit the size limit. PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not.
 
 
 ### Example
