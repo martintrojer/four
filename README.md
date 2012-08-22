@@ -29,7 +29,7 @@ Dependencies and resources are allowed, but obviously need to fit the size limit
 
 ### Example
 
-[`four.clj`](https://github.com/hraberg/four/blob/master/src/four.clj) is an experiment that sets up a few seq / fns for rendering over a timeline in Graphics2D.
+[`four.clj`](https://github.com/hraberg/four/blob/master/src/four.clj) is an experiment that sets up a few seqs / fns for rendering over a timeline in Graphics2D.
 The animation itself is just a flickering of colors, but will obviously soon evolve into a magnificent real time [path tracer](http://www.kevinbeason.com/smallpt/).
 
 
