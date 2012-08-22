@@ -7,7 +7,7 @@
 (def h 600)
 (def hz 50)
 
-(defn frame [g]
+(defn frame [g w h]
   (doto g
     (.setColor (Color. (rand-int 0xffffff)))
     (.fillRect 0 0 w h)
@@ -16,9 +16,10 @@
 
 (defn draw [f c]
   (let [b (.getBufferStrategy c)
-        g (.getDrawGraphics b)]
+        g (.getDrawGraphics b)
+        [w h] [(.getWidth c) (.getHeight c)]]
     (try
-      (f g)
+      (f g w h)
       (finally
        (.dispose g)))
     (when-not (.contentsLost b)
