@@ -5,10 +5,7 @@
           [java.awt.event KeyListener KeyEvent]
           [javax.media.opengl GLProfile GLCapabilities GL2 GLContext GLEventListener]
           [javax.media.opengl.glu.gl2 GLUgl2]
-          [javax.media.opengl.awt GLCanvas])
-  (:refer-clojure :exclude [flush])
-  )
-
+          [javax.media.opengl.awt GLCanvas]))
 
 (defn ^:private constants [prefix c]
   (->> (.getFields c)
@@ -38,8 +35,8 @@
 
 (defn ^:private camel [s]
   (->> (re-seq #"[^-]+" (str s))
-       (map (fn [[c & cs]] (apply str (s/upper-case c) cs)))
-       (apply str)))
+       (mapcat (fn [[c & cs]] (cons (s/upper-case c) cs)))
+       s/join))
 
 (def gl-constants (constants "GL_" GL2))
 

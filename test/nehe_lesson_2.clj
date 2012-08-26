@@ -1,7 +1,6 @@
 (ns nehe-lesson-2
   (use minigl)
-  (import [javax.media.opengl GLEventListener])
-  (:refer-clojure :exclude [flush]))
+  (import [javax.media.opengl GLEventListener]))
 
 (def renderer
   (proxy [GLEventListener] []
