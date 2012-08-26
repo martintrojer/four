@@ -3,7 +3,7 @@
 PROJECT=four
 JAR=$PROJECT.jar
 JAR_PG=$PROJECT-pg.jar
-CLOJURE_VERSION=1.5.0-alpha3
+CLOJURE_VERSION=1.5.0-alpha4
 CLOJURE_JAR=~/.m2/repository/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.jar
 
 rm -rf target
