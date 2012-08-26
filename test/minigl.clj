@@ -16,49 +16,50 @@
                (symbol (.getName c) (.getName f))]))
        (into {})))
 
-(defn ^:private unprefixed-methods [pre c]
-  (->>  (.getMethods c)
-        (map #(subs (.getName %) (count pre)))
-        set))
-
-(def ^:private gl2-methods (unprefixed-methods "gl" GL2))
-(def ^:private glu-methods (unprefixed-methods "glu" GLUgl2))
-
-(defn ^:private constants [prefix c]
-  (->> (.getFields c)
-       (map (fn [f]
-              [(keyword (-> (.getName f) s/lower-case
-                            (s/replace "_" "-")
-                            (subs (count prefix))))
-               (symbol (.getName c) (.getName f))]))
-       (into {})))
-
-(defn ^:private camel [s]
-  (->> (re-seq #"[^-]+" (str s))
-       (mapcat (fn [[c & cs]] (cons (s/upper-case c) cs)))
-       s/join))
-
 (def gl-constants (constants "GL_" GL2))
+
+(defn gl-constant [c]
+  (if-let [c (gl-constants c)]
+    (eval c)
+    c))
+
+(defn bits [& bits]
+  (apply bit-or (map gl-constant bits)))
+
+(defn ^:private uncamel [s]
+  (s/lower-case (s/replace s #"([a-z])([A-Z])" "$1-$2")))
+
+(defn ^:private gl-methods [prefix c]
+  (->> (.getMethods c)
+       (map (fn [m]
+              [(-> (.getName m)
+                   (subs (count prefix))
+                   uncamel
+                   symbol)
+               m]))
+       (into {})))
 
 (defn gl-context []
   (-> (GLContext/getCurrent) .getGL .getGL2))
 
-(defmacro gl [& body]
-  `(try
-     ~@(for [[m & args :as expr] body]
-         (let [cm (camel m)
-               args (w/postwalk #(get gl-constants % %) args)]
-           (condp some [cm]
-             gl2-methods `(~(symbol (str ".gl" cm)) (gl-context) ~@args)
-             glu-methods `(~(symbol (str ".glu" cm)) (GLUgl2.) ~@args)
-             expr)))
-    (finally
-     (.glFlush (gl-context)))))
+(defmacro ^:private alias-methods [prefix target c]
+  `(do
+     ~@(for [[n m] (gl-methods prefix (resolve c))
+             :when (not ('#{flush class} n))
+             :let [args (->> m .getParameterTypes count range
+                             (map #(symbol (str "x" %))) vec)]]
+         (do
+           `(defn ~n ~args
+              (let [~args (w/postwalk gl-constant ~args)]
+                (. ~target ~(symbol (.getName m)) ~@args)))))))
+
+(alias-methods "gl" (gl-context) GL2)
+(alias-methods "glu" (GLUgl2.) GLUgl2)
 
 (defmacro begin [what & body]
   `(try
      (.glBegin (gl-context) ~(gl-constants what))
-     (gl ~@body)
+     ~@body
      (finally
       (.glEnd (gl-context)))))
 
