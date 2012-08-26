@@ -48,10 +48,9 @@
              :when (not ('#{flush class} n))
              :let [args (->> m .getParameterTypes count range
                              (map #(symbol (str "x" %))) vec)]]
-         (do
-           `(defn ~n ~args
-              (let [~args (w/postwalk gl-constant ~args)]
-                (. ~target ~(symbol (.getName m)) ~@args)))))))
+         `(defn ~n ~args
+            (let [~args (w/postwalk gl-constant ~args)]
+              (. ~target ~(symbol (.getName m)) ~@args))))))
 
 (alias-methods "gl" (gl-context) GL2)
 (alias-methods "glu" (GLUgl2.) GLUgl2)
