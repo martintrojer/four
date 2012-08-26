@@ -34,7 +34,7 @@ The animation itself is just a flickering of colors, but will obviously soon evo
 
 ### OpenGL
 
-[`nehe-lesson-02.clj`](https://github.com/hraberg/four/blob/master/test/nehe_lesson_02.clj) is Nehe's classic ["Your First Polygon"](http://nehe.gamedev.net/tutorial/your_first_polygon/13002/) lesson using [JOGL](http://jogamp.org/jogl/www/) and a minimal GL wrapper, [`minigl.clj`](https://github.com/hraberg/four/blob/master/test/minigl.clj) (optional - it counts towards the bytes!). The build doesn't properly take OpenGL into account yet, but this can be run using:
+[`nehe-lesson-02.clj`](https://github.com/hraberg/four/blob/master/test/nehe_lesson_2.clj) is Nehe's classic ["Your First Polygon"](http://nehe.gamedev.net/tutorial/your_first_polygon/13002/) lesson using [JOGL](http://jogamp.org/jogl/www/) and a minimal GL wrapper, [`minigl.clj`](https://github.com/hraberg/four/blob/master/test/minigl.clj) (optional - it counts towards the bytes!). The build doesn't properly take OpenGL into account yet, but this can be run using:
 
     lein run -m nehe-lesson-2
 
