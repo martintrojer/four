@@ -23,13 +23,20 @@ More or less, your demo has to be a 4k stripped Clojure jar, that can be run lik
 ### Rules
 
 Fork and go. The bash script [`build`](https://github.com/hraberg/four/blob/master/build) will produce (and run) a jar that satisfies the limitations.
-Dependencies and resources are allowed, but obviously need to fit the size limit. PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not.
+Dependencies and resources are allowed, but obviously need to fit the size limit. PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not. We're planning to support OpenGL, see below.
 
 
 ### Example
 
 [`four.clj`](https://github.com/hraberg/four/blob/master/src/four.clj) is an experiment that sets up a few seqs / fns for rendering over a timeline in Graphics2D.
 The animation itself is just a flickering of colors, but will obviously soon evolve into a magnificent real time [path tracer](http://www.kevinbeason.com/smallpt/).
+
+
+### OpenGL
+
+[`nehe-lesson-02.clj`](https://github.com/hraberg/four/blob/master/test/nehe_lesson_02.clj) is Nehe's classic ["Your First Polygon"](http://nehe.gamedev.net/tutorial/your_first_polygon/13002/) lesson using [JOGL](http://jogamp.org/jogl/www/) and a minimal GL wrapper, [`minigl.clj`](https://github.com/hraberg/four/blob/master/test/minigl.clj) (optional - it counts towards the bytes!). The build doesn't properly take OpenGL into account yet, but this can be run using:
+
+    lein run -m nehe-lesson-2
 
 
 ## References
