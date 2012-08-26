@@ -56,18 +56,24 @@
 (alias-methods "gl" (gl-context) GL2)
 (alias-methods "glu" (GLUgl2.) GLUgl2)
 
-(defmacro begin [what & body]
+(defmacro begin [mode & body]
   `(try
-     (.glBegin (gl-context) ~(gl-constants what))
+     (.glBegin (gl-context) ~(gl-constants mode))
      ~@body
      (finally
-      (.glEnd (gl-context)))))
+      (end))))
 
-(defmacro triangles [& body]
-  `(begin :triangles ~@body))
+(defmacro push-matrix [& body]
+  `(try
+     (.glPushMatrix (gl-context))
+     ~@body
+     (finally
+      (pop-matrix))))
 
-(defmacro quads [& body]
-  `(begin :quads ~@body))
+(doseq [mode [:points :triangles :triangle-strip :triangle-fan
+              :quads :quad-strip :polygon :lines :line-strip :line-loop]]
+  (eval `(defmacro ~(symbol (name mode)) [& ~'body]
+           `(begin ~'~mode ~@~'body))))
 
 (defn canvas []
   (-> (GLProfile/getDefault) GLCapabilities. GLCanvas.))
