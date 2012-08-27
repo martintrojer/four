@@ -2,7 +2,7 @@
   (import [javax.sound.sampled AudioSystem AudioFormat SourceDataLine]))
 
 (def sample-rate 44100)
-(def buffer-size (/ sample-rate 50))
+(def buffer-size (/ sample-rate 25))
 (def buffer (byte-array buffer-size))
 (def sixteen-bit-mono (AudioFormat. sample-rate 16 1 true true))
 (def ^SourceDataLine line-out (AudioSystem/getSourceDataLine sixteen-bit-mono))
@@ -58,6 +58,7 @@
   ([[n oct]] (play [n oct] 1.0))
   ([[n oct] length] (play [n oct] length sin-osc))
   ([[n oct] length osc]
+     (.flush line-out)
      (let [length (long (* length sample-rate))]
        (->> (iterate inc 0)
             (map (juxt identity (partial osc (note [n oct]))))
