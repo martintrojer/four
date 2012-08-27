@@ -36,8 +36,7 @@
   (/ t period))
 
 (defn sin-osc [^double hz ^long t]
-  (let [period (period hz)
-        angle (* (phase period t) 2.0 Math/PI)]
+  (let [angle (* (phase (period hz) t) 2.0 Math/PI)]
     (Math/sin angle)))
 
 (def seconds-per-beat (/ 60.0 bpm))
