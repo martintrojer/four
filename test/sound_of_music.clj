@@ -1,8 +1,9 @@
 (ns sound-of-music
   (import [javax.sound.sampled AudioSystem AudioFormat SourceDataLine]))
 
+(def bpm 120)
 (def sample-rate 44100)
-(def buffer-size (/ sample-rate 25))
+(def buffer-size (/ (* sample-rate 2) 50))
 (def buffer (byte-array buffer-size))
 (def sixteen-bit-mono (AudioFormat. sample-rate 16 1 true true))
 (def ^SourceDataLine line-out (AudioSystem/getSourceDataLine sixteen-bit-mono))
@@ -18,12 +19,6 @@
 (defn note [[n oct]]
   (frequency (+ (.indexOf notes n) (* 12 (- oct 4)))))
 
-(defn clip [^double sample]
-  (min 1.0 (max -1.0 sample)))
-
-(defn sixteen-bit [^double sample]
-  (long (Math/round (* sample 32767.0))))
-
 (defn period [^double hz]
   (/ sample-rate hz))
 
@@ -34,6 +29,33 @@
   (let [period (period hz)
         angle (* (phase period t) 2.0 Math/PI)]
     (Math/sin angle)))
+
+(defn seconds-per-beat []
+  (/ 60.0 bpm))
+
+(defn tone
+  ([] (tone [:a 4]))
+  ([[n oct]] (tone [n oct] 1.0))
+  ([[n oct] length] (tone [n oct] length sin-osc))
+  ([[n oct] length osc]
+     (let [length (long (* length (seconds-per-beat) sample-rate))]
+       (->> (iterate inc 0)
+            (map (partial osc (note [n oct])))
+            (take length)))))
+
+(defn mix [& tracks]
+  (/ (apply + tracks) (count tracks)))
+
+(defn chord
+  ([notes length] (chord notes length sin-osc))
+  ([notes length osc]
+      (apply map mix (map #(tone % length osc) notes))))
+
+(defn clip [^double sample]
+  (min 1.0 (max -1.0 sample)))
+
+(defn sixteen-bit [^double sample]
+  (long (* sample 32767.0)))
 
 (defn write-sample-byte [^"[B" buffer ^long offset ^long sample]
   (let [high (unchecked-byte (- (bit-and (bit-shift-right sample 8) 0xFF) 128))
@@ -53,29 +75,19 @@
 (defn out [[buffer available]]
   (.write line-out buffer 0 available))
 
-(defn tone
-  ([] (tone [:a 4]))
-  ([[n oct]] (tone [n oct] 1.0))
-  ([[n oct] length] (tone [n oct] length sin-osc))
-  ([[n oct] length osc]
-     (let [length (long (* length sample-rate))]
-       (->> (iterate inc 0)
-            (map (partial osc (note [n oct])))
-            (take length)))))
-
 (defn play [samples]
-  (.flush line-out)
   (->> samples
        (map (comp sixteen-bit clip))
-       (partition (/ buffer-size 2))
+       (partition (/ buffer-size 2) (/ buffer-size 2) (repeat 0))
        (map (comp out (partial write-sample-buffer buffer)))
        dorun))
 
 (defn start []
-  (.open line-out sixteen-bit-mono)
-  (.start line-out)
-  (.flush line-out))
+  (.open line-out sixteen-bit-mono buffer-size)
+  (.start line-out))
 
 (defn stop []
   (.stop line-out)
   (.close line-out))
+
+(start)
