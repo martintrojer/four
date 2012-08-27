@@ -6,18 +6,7 @@
           [javax.media.opengl GLProfile GLCapabilities GL2 GLContext GLEventListener]
           [javax.media.opengl.glu.gl2 GLUgl2]
           [javax.media.opengl.awt GLCanvas])
-  (:refer-clojure :exclude [flush])
-  )
-
-
-(defn ^:private constants [prefix c]
-  (->> (.getFields c)
-       (map (fn [f]
-              [(keyword (-> (.getName f) s/lower-case
-                            (s/replace "_" "-")
-                            (subs (count prefix))))
-               (symbol (.getName c) (.getName f))]))
-       (into {})))
+  (:refer-clojure :exclude [flush]))
 
 (defn ^:private unprefixed-methods [pre c]
   (->>  (.getMethods c)
