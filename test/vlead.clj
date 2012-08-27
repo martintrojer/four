@@ -1,5 +1,15 @@
-(ns sound-of-music
+(ns vlead
   (import [javax.sound.sampled AudioSystem AudioFormat SourceDataLine]))
+
+;; In rememberance of http://www.nada.kth.se/~raberg/vl.html, my 1996-97 Nord Lead simulator.
+;; It more or less worked, was written in C++.
+
+;; It cannot do much, try:
+;; (->> (chord [[:a 4] [:e 4] [:c# 5]] 1/8)
+;;      (repeat 8)
+;;      (map play)
+
+;; I don't like the way the time / current frame pollutes the oscillator generation. Early days.
 
 (def bpm 120)
 (def sample-rate 44100)
@@ -30,15 +40,14 @@
         angle (* (phase period t) 2.0 Math/PI)]
     (Math/sin angle)))
 
-(defn seconds-per-beat []
-  (/ 60.0 bpm))
+(def seconds-per-beat (/ 60.0 bpm))
 
 (defn tone
   ([] (tone [:a 4]))
   ([[n oct]] (tone [n oct] 1.0))
   ([[n oct] length] (tone [n oct] length sin-osc))
   ([[n oct] length osc]
-     (let [length (long (* length (seconds-per-beat) sample-rate))]
+     (let [length (* length seconds-per-beat sample-rate)]
        (->> (iterate inc 0)
             (map (partial osc (note [n oct])))
             (take length)))))

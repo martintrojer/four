@@ -39,6 +39,11 @@ The animation itself is just a flickering of colors, but will obviously soon evo
     lein run -m nehe-lesson-2
 
 
+### Music
+
+I've started working on a very rudimentary software synthesizer, [`vlead.clj`](https://github.com/hraberg/four/blob/master/test/vlead.clj) in pure Clojure using [javax.sound.sampled](http://www.jsresources.org/index.html) for output. This one isn't optimized for size as it needs to work first.
+
+
 ## References
 
 [Java4k Game Rules](http://www.java4k.com/index.php?action=view&page=rulesjudg)
