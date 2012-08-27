@@ -11,6 +11,13 @@
 ;;      (repeat 8)
 ;;      (map play))
 
+;; A first stab at routing, some pulse width modulation:
+;; (play (tone [:a 4] 5 (partial sqr (partial tri 0.5))))
+
+;; Or a full chord with a different bass:
+;;;(let [inst (partial sqr (partial tri 0.5))]
+;;   (play (chord [[:a 2 saw] [:a 4] [:e 4] [:c# 5]] 5 inst)))
+
 ;; I don't like the way the time / current frame pollutes the oscillator generation. Early days.
 
 (def bpm 120)
@@ -37,14 +44,25 @@
 (defn period [^double hz]
   (/ sample-rate hz))
 
+(defn abs [^double x]
+  (Math/abs x))
+
+(defn as-period [^double x]
+  (/ (+ 1 x) 2))
+
+(defn amp [^double velocity ^double x]
+  (* velocity x))
+
 (defn phase [^double period ^long t]
   (/ (mod t period) period))
 
 (defn sin [^double hz ^long t]
   (Math/sin (* (phase (period hz) t) 2.0 Math/PI)))
 
-(defn sqr [^double hz ^long t]
-  (if (< (phase (period hz) t) 0.5) 1.0 -1.0))
+(defn sqr
+  ([^double hz ^long t] (sqr (constantly 0.5) hz t))
+  ([pwm ^double hz ^long t]
+     (if (< (phase (period hz) t) (as-period (pwm t))) 1.0 -1.0)))
 
 (defn tri [^double hz ^long t]
   (let [phase (phase (period hz) t)]
@@ -118,7 +136,7 @@
 (defn write
   ([samples] (write "test.wav" samples))
   ([file samples]
-     (let [bytes (byte-array (* (count samples) 2))]
+     (let [bytes (byte-array (* (count samples) (.getFrameSize audio-format)))]
        (write-sample-buffer bytes (map (comp bits clip) samples))
        (AudioSystem/write (AudioInputStream. (ByteArrayInputStream. bytes) audio-format (count samples))
                           AudioFileFormat$Type/WAVE (io/file file)))))
