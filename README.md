@@ -52,6 +52,6 @@ I've started working on a very rudimentary software synthesizer, [`vlead.clj`](h
 
 [Assembly 4k Archive](http://archive.assembly.org/2011/4k-intro)
 
-[Notch's Left 4k Dead](http://www.mojang.com/notch/j4k/l4kd/)
+[Notch's Left 4k Dead](http://www.mojang.com/notch/j4k/l4kd/) (Persson, 2009)
 
 [The Art of Demomaking](http://www.flipcode.com/archives/The_Art_of_Demomaking-Issue_01_Prologue.shtml) (Champandard, 1999) over at [flipcode](http://www.flipcode.com/misc/fc3_announce/) which just (Aug 22, 2012) relanched!
