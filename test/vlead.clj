@@ -1,5 +1,7 @@
 (ns vlead
-  (import [javax.sound.sampled AudioSystem AudioFormat SourceDataLine]))
+  (require [clojure.java.io :as io])
+  (import [javax.sound.sampled AudioSystem AudioFormat AudioFileFormat$Type AudioInputStream SourceDataLine]
+          [java.io ByteArrayInputStream]))
 
 ;; In rememberance of http://www.nada.kth.se/~raberg/vl.html, my 1996-97 Nord Lead simulator.
 ;; It more or less worked, was written in C++.
@@ -14,7 +16,7 @@
 (def bpm 120)
 (def sample-rate 44100)
 (def buffer-size (/ (* sample-rate 2) 50))
-(def buffer (byte-array buffer-size))
+(def ^"[B" buffer (byte-array buffer-size))
 (def sixteen-bit-mono (AudioFormat. sample-rate 16 1 true true))
 (def ^SourceDataLine line-out (AudioSystem/getSourceDataLine sixteen-bit-mono))
 
@@ -36,8 +38,7 @@
   (/ t period))
 
 (defn sin-osc [^double hz ^long t]
-  (let [angle (* (phase (period hz) t) 2.0 Math/PI)]
-    (Math/sin angle)))
+  (Math/sin (* (phase (period hz) t) 2.0 Math/PI)))
 
 (def seconds-per-beat (/ 60.0 bpm))
 
@@ -62,12 +63,14 @@
 (defn clip [^double sample]
   (min 1.0 (max -1.0 sample)))
 
+(def max-amplitude (dec (Math/pow 2 (dec (.getSampleSizeInBits sixteen-bit-mono)))))
+
 (defn sixteen-bit [^double sample]
-  (long (* sample 32767.0)))
+  (Math/round (* sample max-amplitude)))
 
 (defn write-sample-byte [^"[B" buffer ^long offset ^long sample]
-  (let [high (unchecked-byte (- (bit-and (bit-shift-right sample 8) 0xFF) 128))
-        low (unchecked-byte (- (bit-and sample 0xFF) 128))]
+  (let [high (unchecked-byte (+ (bit-and (bit-shift-right sample 8) 0xFF)))
+        low (unchecked-byte (bit-and sample 0xFF))]
     (aset-byte buffer (int offset) high)
     (aset-byte buffer (int (inc offset)) low)
     buffer))
@@ -89,6 +92,14 @@
        (partition (/ buffer-size 2) (/ buffer-size 2) (repeat 0))
        (map (comp out (partial write-sample-buffer buffer)))
        dorun))
+
+(defn write
+  ([samples] (write "test.wav" samples))
+  ([file samples]
+     (let [bytes (byte-array (* (count samples) 2))]
+       (write-sample-buffer bytes (map (comp sixteen-bit) samples))
+       (AudioSystem/write (AudioInputStream. (ByteArrayInputStream. bytes) sixteen-bit-mono (count samples))
+                          AudioFileFormat$Type/WAVE (io/file file)))))
 
 (defn start []
   (.open line-out sixteen-bit-mono buffer-size)
