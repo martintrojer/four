@@ -3,7 +3,7 @@
   (import [javax.sound.sampled AudioSystem AudioFormat AudioFileFormat$Type AudioInputStream SourceDataLine]
           [java.io ByteArrayInputStream]))
 
-;; In rememberance of http://www.nada.kth.se/~raberg/vl.html, my 1996-97 Nord Lead simulator.
+;; In remembrance of http://www.nada.kth.se/~raberg/vl.html, my 1996-97 Nord Lead simulator.
 ;; It more or less worked, was written in C++.
 
 ;; It cannot do much, try:
