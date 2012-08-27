@@ -53,24 +53,28 @@
 (defn out [[buffer available]]
   (.write line-out buffer 0 available))
 
-(defn play
-  ([] (play [:a 4]))
-  ([[n oct]] (play [n oct] 1.0))
-  ([[n oct] length] (play [n oct] length sin-osc))
+(defn tone
+  ([] (tone [:a 4]))
+  ([[n oct]] (tone [n oct] 1.0))
+  ([[n oct] length] (tone [n oct] length sin-osc))
   ([[n oct] length osc]
-     (.flush line-out)
      (let [length (long (* length sample-rate))]
        (->> (iterate inc 0)
-            (map (juxt identity (partial osc (note [n oct]))))
-            (map (comp sixteen-bit clip second))
-            (take length)
-            (partition (/ buffer-size 2))
-            (map (comp out (partial write-sample-buffer buffer)))
-            dorun))))
+            (map (partial osc (note [n oct])))
+            (take length)))))
+
+(defn play [samples]
+  (.flush line-out)
+  (->> samples
+       (map (comp sixteen-bit clip))
+       (partition (/ buffer-size 2))
+       (map (comp out (partial write-sample-buffer buffer)))
+       dorun))
 
 (defn start []
   (.open line-out sixteen-bit-mono)
-  (.start line-out))
+  (.start line-out)
+  (.flush line-out))
 
 (defn stop []
   (.stop line-out)
