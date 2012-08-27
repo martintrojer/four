@@ -23,13 +23,25 @@ More or less, your demo has to be a 4k stripped Clojure jar, that can be run lik
 ### Rules
 
 Fork and go. The bash script [`build`](https://github.com/hraberg/four/blob/master/build) will produce (and run) a jar that satisfies the limitations.
-Dependencies and resources are allowed, but obviously need to fit the size limit. PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not.
+Dependencies and resources are allowed, but obviously need to fit the size limit. PACK200 is allowed, as is [ProGuard](http://proguard.sourceforge.net/), which the `build` script uses. Pulling resources from the network or local drive is not. We're planning to support OpenGL, see below.
 
 
 ### Example
 
 [`four.clj`](https://github.com/hraberg/four/blob/master/src/four.clj) is an experiment that sets up a few seqs / fns for rendering over a timeline in Graphics2D.
 The animation itself is just a flickering of colors, but will obviously soon evolve into a magnificent real time [path tracer](http://www.kevinbeason.com/smallpt/).
+
+
+### OpenGL
+
+[`nehe-lesson-02.clj`](https://github.com/hraberg/four/blob/master/test/nehe_lesson_2.clj) is Nehe's classic ["Your First Polygon"](http://nehe.gamedev.net/tutorial/your_first_polygon/13002/) lesson using [JOGL](http://jogamp.org/jogl/www/) and a minimal GL wrapper, [`minigl.clj`](https://github.com/hraberg/four/blob/master/test/minigl.clj) (optional - it counts towards the bytes!). The build doesn't properly take OpenGL into account yet, but this can be run using:
+
+    lein run -m nehe-lesson-2
+
+
+### Music
+
+I've started working on a very rudimentary software synthesizer, [`vlead.clj`](https://github.com/hraberg/four/blob/master/test/vlead.clj) in pure Clojure using [javax.sound.sampled](http://www.jsresources.org/index.html) for output. This one isn't optimized for size as it needs to work first.
 
 
 ## References
@@ -40,4 +52,6 @@ The animation itself is just a flickering of colors, but will obviously soon evo
 
 [Assembly 4k Archive](http://archive.assembly.org/2011/4k-intro)
 
-[Notch's Left 4k Dead](http://www.mojang.com/notch/j4k/l4kd/)
+[Notch's Left 4k Dead](http://www.mojang.com/notch/j4k/l4kd/) (Persson, 2009)
+
+[The Art of Demomaking](http://www.flipcode.com/archives/The_Art_of_Demomaking-Issue_01_Prologue.shtml) (Champandard, 1999) over at [flipcode](http://www.flipcode.com/misc/fc3_announce/) which just (Aug 22, 2012) relanched!
